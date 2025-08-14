@@ -1,0 +1,62 @@
+class ProjectModel {
+  final int id;
+  final String title;
+  final String? description;
+  final DateTime? initialDate;
+  final DateTime? finishDate;
+  final bool statusActive;
+
+  ProjectModel({
+    required this.id,
+    required this.title,
+    this.description,
+    this.initialDate,
+    this.finishDate,
+    required this.statusActive,
+  });
+
+  /// Função auxiliar para converter data de vários formatos
+  static DateTime? parseDate(dynamic value) {
+    if (value == null) return null;
+
+    if (value is String && value.isNotEmpty) {
+      return DateTime.tryParse(value);
+    }
+
+    if (value is List && value.length >= 3) {
+      return DateTime(value[0], value[1], value[2]);
+    }
+
+    if (value is Map && value.containsKey('year')) {
+      return DateTime(value['year'], value['month'], value['day']);
+    }
+
+    return null;
+  }
+
+  factory ProjectModel.fromJson(Map<String, dynamic> json) {
+    return ProjectModel(
+      id: json['id'],
+      title: json['title'] ?? '',
+      description: json['description'],
+      initialDate: parseDate(json['initialDate']),
+      finishDate: parseDate(json['finishDate']),
+      statusActive: json['statusActive'] ?? true,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    String? fmt(DateTime? d) => d == null
+        ? null
+        : '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'initialDate': fmt(initialDate),
+      'finishDate': fmt(finishDate),
+      'statusActive': statusActive,
+    };
+  }
+}
